@@ -13,10 +13,12 @@ The dataset is a subset of Amazon product reviews (Electronics category), contai
 - Review text
 - Star ratings
 - Metadata such as votes and verified purchase status
+
 A sample of approximately 100,000 reviews is used for efficient processing.
 
 ## Methodology
 The project follows a structured machine learning pipeline:
+
 1. Data Loading  
    - Read compressed JSON data and convert to structured format  
 2. Data Cleaning  
@@ -39,6 +41,7 @@ The project follows a structured machine learning pipeline:
 8. Evaluation  
    - Precision, Recall, F1-score  
    - Confusion Matrix
+
 ## Confusion Matrix
 
 ![Confusion Matrix](results/confusion_matrix.png)
@@ -49,6 +52,7 @@ The project follows a structured machine learning pipeline:
 - After applying class weighting:
   - Recall for negative reviews improved significantly
 - Threshold tuning further improved model flexibility.
+
 Final model:
 - Achieves strong performance on positive reviews
 - Significantly improves detection of negative feedback
@@ -65,12 +69,14 @@ Final model:
 - Accuracy: ~90%  
 - Negative Recall: ~0.88  
 - Positive F1-score: ~0.94  
+
 The model is optimized to detect negative reviews, which are critical in real-world monitoring systems.
 
 ## Key Insights
 - Negative reviews tend to be longer and more detailed
 - Negative reviews receive more helpful votes
 - Verified purchases are more likely to be positive
+
 These insights highlight behavioral patterns in user-generated content.
 
 ## Real-World Impact
@@ -78,12 +84,14 @@ Understanding customer sentiment is critical for businesses to:
 - Detect negative feedback early  
 - Improve product quality  
 - Enhance customer satisfaction  
+
 This project demonstrates how machine learning can be applied to large-scale user-generated data to extract actionable insights.
 
 ## Limitations
 - The model may struggle with sarcasm or complex language
 - Class imbalance still affects precision
 - Only basic NLP techniques (TF-IDF) are used
+
 Future improvements could include deep learning models such as BERT.
 
 ## Conclusion
@@ -94,3 +102,13 @@ It emphasizes not only model performance but also interpretability and decision-
 - Experiment with advanced models (e.g., BERT)
 - Improve text preprocessing
 - Deploy as an API or web application
+## How to Run
+
+1. Clone the repository
+2. Install dependencies:
+   `pip install -r requirements.txt`
+3. Open the notebooks in order:
+   - `01_data_loading.ipynb`
+   - `02_data_cleaning_and_labeling.ipynb`
+   - `03_eda.ipynb`
+   - `main.ipynb`
