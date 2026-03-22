@@ -40,9 +40,6 @@ The project follows a structured machine learning pipeline:
    - Precision, Recall, F1-score  
    - Confusion Matrix
 
-## Confusion Matrix
-
-![Confusion Matrix](results/confusion_matrix_v2.png)
 
 ## Results
 - Baseline model achieved high accuracy but failed to detect negative reviews effectively.
