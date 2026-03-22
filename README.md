@@ -53,6 +53,14 @@ Final model:
 - Achieves strong performance on positive reviews
 - Significantly improves detection of negative feedback
 
+## Model Comparison
+
+| Model | Accuracy | Negative Precision | Negative Recall | Negative F1 | Positive F1 |
+|------|---------:|-------------------:|----------------:|------------:|------------:|
+| Baseline Logistic Regression | 0.94 | 0.85 | 0.50 | 0.63 | 0.97 |
+| Class-weighted Logistic Regression | 0.90 | 0.49 | 0.88 | 0.63 | 0.94 |
+| Threshold-tuned Logistic Regression (0.5) | 0.90 | 0.49 | 0.88 | 0.63 | 0.94 |
+
 ## Key Performance
 - Accuracy: ~90%  
 - Negative Recall: ~0.88  
