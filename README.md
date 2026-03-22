@@ -41,7 +41,8 @@ The project follows a structured machine learning pipeline:
    - Confusion Matrix
 ## Confusion Matrix
 
-![Confusion Matrix](results/confusion_matrix.png)
+<img width="602" height="55" alt="image" src="https://github.com/user-attachments/assets/18c6de83-f8df-4df8-a177-aad998a2f6e0" />
+
 
 ## Results
 - Baseline model achieved high accuracy but failed to detect negative reviews effectively.
