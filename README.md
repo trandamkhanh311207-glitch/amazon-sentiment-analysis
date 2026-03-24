@@ -114,10 +114,15 @@ The optimal operating point shows that:
 amazon-sentiment-analysis/
 │
 ├── data/
+
 ├── notebooks/
+
 │ └── main.ipynb
+
 ├── results/
+
 ├── README.md
+
 └── requirements.txt
 
 ---
