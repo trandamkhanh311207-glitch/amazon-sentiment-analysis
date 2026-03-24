@@ -111,7 +111,7 @@ The optimal operating point shows that:
 ---
 
 ## 🏗️ Project Structure
-'''
+```
 amazon-sentiment-analysis/
 ├── data/
 ├── notebooks/
@@ -119,7 +119,7 @@ amazon-sentiment-analysis/
 ├── results/
 ├── README.md
 └── requirements.txt
-'''
+```
 
 ---
 
