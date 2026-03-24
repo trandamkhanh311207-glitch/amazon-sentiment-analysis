@@ -1,189 +1,184 @@
-# 🧠 Amazon Review Sentiment Analysis
+# Amazon Review Sentiment Analysis
 
-A machine learning project that classifies Amazon product reviews into **positive** and **negative** sentiments using NLP techniques.
+## Executive Summary
 
-This project goes beyond basic modeling by focusing on **model evaluation, threshold optimization, and error analysis** to understand real-world limitations of sentiment classification.
+**Problem**
+Build a sentiment classification system for Amazon product reviews and analyze why strong aggregate metrics (e.g., accuracy, F1-score) can still hide critical real-world failure cases.
+
+**Dataset**
+Amazon Electronics reviews (~100,000 sampled subset from a large-scale dataset).
+
+* Positive: rating ≥ 4
+* Negative: rating ≤ 2
+
+**Best Model**
+TF-IDF + Logistic Regression with class weighting and threshold optimization
+
+**Best Performance**
+
+* F1-score ≈ **0.97** at optimal threshold (~0.16)
+* Default threshold F1 ≈ **0.945**
+
+**Why This Project Is Non-Trivial**
+This is not a standard text classification task. The project addresses:
+
+* Class imbalance
+* Threshold selection beyond default (0.5)
+* Misleading aggregate metrics
+* Real-world model reliability through error analysis
+
+**Key Insight**
+High performance metrics do not guarantee reliability.
+Careful threshold tuning and structured error analysis are essential to uncover model weaknesses.
 
 ---
 
-## 🎯 Objectives
+## Results
 
-- Build a complete NLP pipeline for sentiment classification
-- Evaluate model performance using multiple metrics
-- Optimize decision threshold using Precision-Recall trade-off
-- Analyze model errors to uncover real-world challenges
-- Compare different models to justify design choices
+### Confusion Matrix
 
----
+![Confusion Matrix](results/figures/confusion_matrix.png)
 
-## 🏗️ Project Structure
-```
-amazon-sentiment-analysis/
-│
-├── data/ # Raw and processed data
-├── notebooks/ # Jupyter notebooks
-│ └── main.ipynb
-├── results/ # Plots and evaluation outputs
-├── README.md
-└── requirements.txt
-```
+### Precision-Recall Curve
+
+![PR Curve](results/figures/pr_curve.png)
+
+### Threshold Optimization
+
+* Systematically evaluated thresholds from 0.05 → 0.95
+* Identified optimal threshold maximizing F1-score
+* Demonstrates how default thresholds can be suboptimal
 
 ---
 
-## ⚙️ Methodology
+## Methodology
 
 ### 1. Data Processing
-- Cleaned raw Amazon review data
-- Removed missing and noisy samples
-- Created sentiment labels based on rating:
-  - Positive: rating ≥ 4
-  - Negative: rating ≤ 2
 
----
+* Removed neutral reviews (rating = 3)
+* Converted ratings into binary labels
+* Cleaned text data (basic preprocessing)
+* Generated a structured dataset for modeling
 
 ### 2. Feature Engineering
-- TF-IDF vectorization
-- Sparse high-dimensional representation of text
+
+* TF-IDF vectorization
+* Sparse high-dimensional representation of text
+
+### 3. Models Evaluated
+
+* Logistic Regression
+* Naive Bayes (Multinomial)
+* (Optional extensions ready)
+
+### 4. Model Optimization
+
+* Class weighting for imbalance handling
+* Threshold tuning based on F1-score
+* Precision-recall trade-off analysis
+
+### 5. Evaluation Strategy
+
+* Accuracy, Precision, Recall, F1-score
+* Confusion Matrix
+* Precision-Recall Curve
+* Threshold vs F1 analysis
 
 ---
 
-### 3. Models
+## Error Analysis
 
-#### Logistic Regression (Main Model)
-- Handles high-dimensional sparse data effectively
-- Supports class weighting for imbalance handling
+To move beyond surface-level metrics, the project includes manual error analysis:
 
-#### Multinomial Naive Bayes (Baseline)
-- Fast and simple probabilistic model
-- Strong baseline for text classification
+* Misclassified samples inspection
+* Identification of common failure patterns:
 
----
+  * Mixed sentiment
+  * Weak sentiment signals
+  * Ambiguous language
+  * Label noise
 
-## 📊 Model Performance
-
-### Logistic Regression
-
-| Metric | Score |
-|------|------|
-| Precision | 0.986 |
-| Recall | 0.907 |
-| F1-score | 0.945 |
+This step highlights the gap between **metric performance** and **real-world robustness**.
 
 ---
 
-### Multinomial Naive Bayes
-
-| Metric | Score |
-|------|------|
-| Precision | 0.916 |
-| Recall | 0.999 |
-| F1-score | 0.956 |
-
----
-
-## ⚖️ Model Comparison
-
-Although Multinomial Naive Bayes achieves a slightly higher F1-score, a deeper analysis reveals important limitations.
-
-- Naive Bayes achieves **near-perfect recall (≈1.00)** for the positive class
-- However, it performs extremely poorly on the negative class (recall ≈ 0.11)
-
-This happens due to **class imbalance**, where positive reviews dominate the dataset.
-
-As a result:
-- Naive Bayes predicts most samples as positive
-- This inflates recall and F1-score artificially
-
-👉 Logistic Regression is preferred because it provides:
-- More balanced performance
-- Better handling of minority class
-- More reliable decision boundaries
-
----
-
-## 🎯 Threshold Optimization
-
-Instead of using the default threshold (0.5), I optimized the classification threshold using the Precision-Recall curve.
-
-- Best threshold: **~0.16**
-- Best F1-score: **~0.97**
-
-This improves recall while maintaining strong precision, making the model more suitable for real-world applications.
-
----
-
-## 📈 Precision-Recall Curve
-
-The Precision-Recall curve was used to visualize the trade-off between precision and recall.
-
-The optimal threshold was selected based on maximizing the F1-score.
-
----
-
-## 🔍 Error Analysis
-
-To better understand model limitations, I manually analyzed misclassified samples.
-
-### Key Error Patterns
-
-1. **Label Noise from Rating-Based Supervision (Most Frequent)**
-   - Reviews labeled as positive but contain negative text (e.g., "poor quality")
-   - Caused by mismatch between rating and actual sentiment
-
----
-
-2. **Mixed Sentiment**
-   - Reviews contain both positive and negative opinions
-   - Difficult for bag-of-words models to determine dominant sentiment
-
----
-
-3. **Context-Dependent Meaning**
-   - Requires understanding sentence structure (e.g., "but", "however")
-   - Not captured by TF-IDF features
-
----
-
-4. **Weak Sentiment Signals**
-   - Words like "good", "okay" lack strong polarity
-   - Leads to ambiguity in classification
-
----
-
-5. **Ambiguity**
-   - Some reviews are inherently unclear
-
----
-
-6. **Negation**
-   - Phrases like "not bad" are misinterpreted
-   - TF-IDF cannot model word interactions
-
----
-
-## 🧠 Key Insights
-
-- High accuracy does not guarantee real-world reliability
-- Class imbalance can heavily bias model behavior
-- Threshold tuning significantly impacts performance
-- Error analysis is essential for understanding model limitations
-
----
-
-## 🚀 Future Improvements
-
-- Use advanced models (e.g., BERT, RoBERTa)
-- Handle negation and context more effectively
-- Improve labeling strategy (reduce noise)
-- Perform hyperparameter tuning
-- Deploy as a real-time sentiment analysis API
-
----
-
-## 🛠️ Installation
+## Repository Structure
 
 ```
-bash
+amazon-sentiment-analysis/
+├── data/
+│   ├── raw/
+│   ├── interim/
+│   └── processed/
+├── notebooks/
+├── src/
+├── configs/
+├── results/
+│   ├── figures/
+│   ├── tables/
+│   └── error_analysis/
+├── reports/
+├── demo/
+├── tests/
+├── README.md
+├── requirements.txt
+└── LICENSE
+```
+
+---
+
+## How to Reproduce
+
+```bash
 git clone https://github.com/trandamkhanh311207-glitch/amazon-sentiment-analysis.git
 cd amazon-sentiment-analysis
 pip install -r requirements.txt
+jupyter notebook
+```
+
+Open:
+
+```
+notebooks/main.ipynb
+```
+
+---
+
+## Dataset
+
+The original dataset is too large to be included in this repository.
+
+You can download it from:
+https://nijianmo.github.io/amazon/index.html
+
+This project uses a sampled subset (~100k reviews) located in:
+
+```
+data/interim/
+```
+
+---
+
+## Key Takeaways
+
+* Default classification thresholds are often suboptimal
+* High F1-score can still mask systematic model failures
+* Error analysis is essential for understanding model behavior
+* Structured pipelines improve reproducibility and clarity
+
+---
+
+## Future Improvements
+
+* ROC Curve and calibration analysis
+* Transformer-based models (BERT, RoBERTa)
+* Explainability (SHAP / feature importance)
+* Deployment (Streamlit demo)
+
+---
+
+## Author
+
+**Tran Dam Khanh**
+
+This project was developed as part of a data science portfolio focused on building **real-world, interpretable, and production-aware machine learning systems**.
