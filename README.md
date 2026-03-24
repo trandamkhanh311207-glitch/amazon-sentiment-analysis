@@ -1,154 +1,189 @@
-# 📊 Amazon Review Sentiment Analysis
+# 🧠 Amazon Review Sentiment Analysis
 
-## 🔍 Overview
+A machine learning project that classifies Amazon product reviews into **positive** and **negative** sentiments using NLP techniques.
 
-This project builds a complete sentiment analysis pipeline on Amazon product reviews using Natural Language Processing (NLP) techniques.
-
-The goal is not only to classify reviews as positive or negative, but also to **analyze model behavior, understand its limitations, and extract meaningful insights from errors**.
+This project goes beyond basic modeling by focusing on **model evaluation, threshold optimization, and error analysis** to understand real-world limitations of sentiment classification.
 
 ---
 
 ## 🎯 Objectives
 
-- Build a full NLP pipeline from raw text to predictions
+- Build a complete NLP pipeline for sentiment classification
 - Evaluate model performance using multiple metrics
-- Analyze classification errors to understand model limitations
-- Explore threshold optimization using Precision–Recall trade-offs
-
----
-
-## 🧠 Methodology
-
-### 1. Data Processing
-- Cleaned raw review text
-- Removed noise (punctuation, lowercasing, etc.)
-- Labeled sentiment based on rating (positive vs negative)
-
-### 2. Feature Engineering
-- Used **TF-IDF vectorization**
-- Converted text into numerical features
-
-### 3. Modeling
-- Logistic Regression (main model)
-- Multinomial Naive Bayes (baseline)
-
-### 4. Evaluation
-- Precision, Recall, F1-score
-- Confusion Matrix
-- Threshold analysis
-
----
-
-## Model Comparison
-
-To contextualize the performance of Logistic Regression, I trained a Multinomial Naive Bayes baseline on the same TF-IDF features.
-
-| Model | Precision | Recall | F1-score |
-|------|----------:|-------:|---------:|
-| Logistic Regression | 0.986 | 0.907 | 0.945 |
-| Multinomial Naive Bayes | 0.916 | 0.999 | 0.956 |
-
-Although Multinomial Naive Bayes achieves a slightly higher F1-score, this is largely due to the strong class imbalance in the dataset. The model predicts the majority class very aggressively, which inflates recall but leads to poor minority-class behavior.
-
-Logistic Regression is preferred because it provides more balanced and interpretable performance.
-
----
-
-## ⚖️ Threshold Optimization
-
-Instead of using the default threshold (0.5), the optimal threshold was found using the Precision–Recall curve.
-
-- **Best threshold:** ~0.16
-- Improves recall significantly
-- Demonstrates trade-off between precision and recall
-
-📌 Key insight:
-> Model performance is not fixed — it depends heavily on decision threshold.
-
----
-
-## 🔬 Error Analysis
-
-A detailed error analysis was conducted by manually inspecting misclassified samples.
-
-### Key Findings:
-
-1. **Label Noise**
-   - Some reviews contain negative text but are labeled positive due to rating-based labeling
-   - Indicates weak supervision in the dataset
-
-2. **Mixed Sentiment**
-   - Reviews often contain both positive and negative opinions
-   - Difficult for linear models to classify correctly
-
-3. **Context Dependency**
-   - Words like "but", "however" require understanding sentence structure
-
-4. **Negation Handling**
-   - Phrases like "not bad" are misinterpreted
-
-5. **Weak Sentiment Signals**
-   - Words like "good", "okay" provide weak signals
-
----
-
-## 📊 Precision–Recall Curve
-
-The Precision–Recall curve highlights the trade-off between precision and recall.
-
-The optimal operating point shows that:
-- Lower thresholds increase recall
-- Higher thresholds increase precision
-
----
-
-## 🧠 Key Insights
-
-- Model performance is influenced by both **algorithm choice** and **data quality**
-- TF-IDF + Logistic Regression performs well on explicit sentiment
-- However, it struggles with:
-  - context
-  - negation
-  - subtle sentiment
-- Threshold tuning can significantly improve performance without changing the model
+- Optimize decision threshold using Precision-Recall trade-off
+- Analyze model errors to uncover real-world challenges
+- Compare different models to justify design choices
 
 ---
 
 ## 🏗️ Project Structure
 ```
 amazon-sentiment-analysis/
-├── data/
-├── notebooks/
+│
+├── data/ # Raw and processed data
+├── notebooks/ # Jupyter notebooks
 │ └── main.ipynb
-├── results/
+├── results/ # Plots and evaluation outputs
 ├── README.md
 └── requirements.txt
 ```
 
 ---
 
+## ⚙️ Methodology
+
+### 1. Data Processing
+- Cleaned raw Amazon review data
+- Removed missing and noisy samples
+- Created sentiment labels based on rating:
+  - Positive: rating ≥ 4
+  - Negative: rating ≤ 2
+
+---
+
+### 2. Feature Engineering
+- TF-IDF vectorization
+- Sparse high-dimensional representation of text
+
+---
+
+### 3. Models
+
+#### Logistic Regression (Main Model)
+- Handles high-dimensional sparse data effectively
+- Supports class weighting for imbalance handling
+
+#### Multinomial Naive Bayes (Baseline)
+- Fast and simple probabilistic model
+- Strong baseline for text classification
+
+---
+
+## 📊 Model Performance
+
+### Logistic Regression
+
+| Metric | Score |
+|------|------|
+| Precision | 0.986 |
+| Recall | 0.907 |
+| F1-score | 0.945 |
+
+---
+
+### Multinomial Naive Bayes
+
+| Metric | Score |
+|------|------|
+| Precision | 0.916 |
+| Recall | 0.999 |
+| F1-score | 0.956 |
+
+---
+
+## ⚖️ Model Comparison
+
+Although Multinomial Naive Bayes achieves a slightly higher F1-score, a deeper analysis reveals important limitations.
+
+- Naive Bayes achieves **near-perfect recall (≈1.00)** for the positive class
+- However, it performs extremely poorly on the negative class (recall ≈ 0.11)
+
+This happens due to **class imbalance**, where positive reviews dominate the dataset.
+
+As a result:
+- Naive Bayes predicts most samples as positive
+- This inflates recall and F1-score artificially
+
+👉 Logistic Regression is preferred because it provides:
+- More balanced performance
+- Better handling of minority class
+- More reliable decision boundaries
+
+---
+
+## 🎯 Threshold Optimization
+
+Instead of using the default threshold (0.5), I optimized the classification threshold using the Precision-Recall curve.
+
+- Best threshold: **~0.16**
+- Best F1-score: **~0.97**
+
+This improves recall while maintaining strong precision, making the model more suitable for real-world applications.
+
+---
+
+## 📈 Precision-Recall Curve
+
+The Precision-Recall curve was used to visualize the trade-off between precision and recall.
+
+The optimal threshold was selected based on maximizing the F1-score.
+
+---
+
+## 🔍 Error Analysis
+
+To better understand model limitations, I manually analyzed misclassified samples.
+
+### Key Error Patterns
+
+1. **Label Noise from Rating-Based Supervision (Most Frequent)**
+   - Reviews labeled as positive but contain negative text (e.g., "poor quality")
+   - Caused by mismatch between rating and actual sentiment
+
+---
+
+2. **Mixed Sentiment**
+   - Reviews contain both positive and negative opinions
+   - Difficult for bag-of-words models to determine dominant sentiment
+
+---
+
+3. **Context-Dependent Meaning**
+   - Requires understanding sentence structure (e.g., "but", "however")
+   - Not captured by TF-IDF features
+
+---
+
+4. **Weak Sentiment Signals**
+   - Words like "good", "okay" lack strong polarity
+   - Leads to ambiguity in classification
+
+---
+
+5. **Ambiguity**
+   - Some reviews are inherently unclear
+
+---
+
+6. **Negation**
+   - Phrases like "not bad" are misinterpreted
+   - TF-IDF cannot model word interactions
+
+---
+
+## 🧠 Key Insights
+
+- High accuracy does not guarantee real-world reliability
+- Class imbalance can heavily bias model behavior
+- Threshold tuning significantly impacts performance
+- Error analysis is essential for understanding model limitations
+
+---
+
 ## 🚀 Future Improvements
 
-- Use deep learning models (LSTM, BERT)
-- Incorporate word embeddings
-- Improve labeling quality
-- Perform cross-validation
-- Deploy as a web application
+- Use advanced models (e.g., BERT, RoBERTa)
+- Handle negation and context more effectively
+- Improve labeling strategy (reduce noise)
+- Perform hyperparameter tuning
+- Deploy as a real-time sentiment analysis API
 
 ---
 
-## 🧑‍💻 Author
+## 🛠️ Installation
 
-**Tran Dam Khanh**
-
----
-
-## ⭐ Why This Project Matters
-
-This project goes beyond basic classification by focusing on:
-
-- understanding model behavior
-- identifying real-world data issues
-- making informed decisions using evaluation metrics
-
-It reflects a strong foundation in both **machine learning and analytical thinking**.
+```
+bash
+git clone https://github.com/trandamkhanh311207-glitch/amazon-sentiment-analysis.git
+cd amazon-sentiment-analysis
+pip install -r requirements.txt
