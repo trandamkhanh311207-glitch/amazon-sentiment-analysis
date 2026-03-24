@@ -39,14 +39,18 @@ The goal is not only to classify reviews as positive or negative, but also to **
 
 ---
 
-## 📈 Model Performance
+## Model Comparison
+
+To contextualize the performance of Logistic Regression, I trained a Multinomial Naive Bayes baseline on the same TF-IDF features.
 
 | Model | Precision | Recall | F1-score |
-|------|----------|--------|----------|
-| Logistic Regression | ~0.986 | ~0.907 | ~0.944 |
-| Naive Bayes | ~0.916 | ~1.0 | ~0.955 |
+|------|----------:|-------:|---------:|
+| Logistic Regression | 0.986 | 0.907 | 0.945 |
+| Multinomial Naive Bayes | 0.916 | 0.999 | 0.956 |
 
-Naive Bayes achieves higher recall but is biased toward the majority class, while Logistic Regression provides more balanced performance.
+Although Multinomial Naive Bayes achieves a slightly higher F1-score, this is largely due to the strong class imbalance in the dataset. The model predicts the majority class very aggressively, which inflates recall but leads to poor minority-class behavior.
+
+Logistic Regression is preferred because it provides more balanced and interpretable performance.
 
 ---
 
