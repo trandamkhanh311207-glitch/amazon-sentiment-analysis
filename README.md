@@ -112,18 +112,19 @@ The optimal operating point shows that:
 
 ## 🏗️ Project Structure
 amazon-sentiment-analysis/
+
 │
 ├── data/
 
 ├── notebooks/
 
-│ └── main.ipynb
+   │ └── main.ipynb
 
 ├── results/
 
 ├── README.md
 
-└── requirements.txt
+   └── requirements.txt
 
 ---
 
