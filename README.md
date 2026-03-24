@@ -1,114 +1,149 @@
-# Amazon Review Sentiment Analysis
-This project builds a sentiment analysis system to classify Amazon product reviews into positive and negative categories using natural language processing (NLP) techniques.
+# 📊 Amazon Review Sentiment Analysis
 
-## Objective
-The goal of this project is to:
-- Analyze customer reviews from Amazon
-- Identify patterns in user sentiment
-- Build a classification model to detect negative feedback
-- Handle real-world challenges such as class imbalance
+## 🔍 Overview
 
-## Dataset
-The dataset is a subset of Amazon product reviews (Electronics category), containing:
-- Review text
-- Star ratings
-- Metadata such as votes and verified purchase status
+This project builds a complete sentiment analysis pipeline on Amazon product reviews using Natural Language Processing (NLP) techniques.
 
-A sample of approximately 100,000 reviews is used for efficient processing.
+The goal is not only to classify reviews as positive or negative, but also to **analyze model behavior, understand its limitations, and extract meaningful insights from errors**.
 
-## Methodology
-The project follows a structured machine learning pipeline:
+---
 
-1. Data Loading  
-   - Read compressed JSON data and convert to structured format  
-2. Data Cleaning  
-   - Handle missing values  
-   - Normalize numeric fields  
-   - Select relevant features  
-3. Labeling  
-   - Ratings ≥ 4 → Positive  
-   - Ratings ≤ 2 → Negative  
-   - Neutral reviews removed  
-4. Exploratory Data Analysis (EDA)  
-   - Analyze review length, helpful votes, and verified purchases  
-5. Modeling  
-   - TF-IDF vectorization  
-   - Logistic Regression baseline  
-6. Handling Class Imbalance  
-   - Apply class weighting  
-7. Threshold Tuning  
-   - Adjust decision threshold to improve recall  
-8. Evaluation  
-   - Precision, Recall, F1-score  
-   - Confusion Matrix
+## 🎯 Objectives
 
-## Confusion Matrix
+- Build a full NLP pipeline from raw text to predictions
+- Evaluate model performance using multiple metrics
+- Analyze classification errors to understand model limitations
+- Explore threshold optimization using Precision–Recall trade-offs
 
-![Confusion Matrix](results/confusion_matrix.png)
+---
 
+## 🧠 Methodology
 
-## Results
-- Baseline model achieved high accuracy but failed to detect negative reviews effectively.
-- After applying class weighting:
-  - Recall for negative reviews improved significantly
-- Threshold tuning further improved model flexibility.
+### 1. Data Processing
+- Cleaned raw review text
+- Removed noise (punctuation, lowercasing, etc.)
+- Labeled sentiment based on rating (positive vs negative)
 
-Final model:
-- Achieves strong performance on positive reviews
-- Significantly improves detection of negative feedback
+### 2. Feature Engineering
+- Used **TF-IDF vectorization**
+- Converted text into numerical features
 
-## Model Comparison
+### 3. Modeling
+- Logistic Regression (main model)
+- Multinomial Naive Bayes (baseline)
 
-| Model | Accuracy | Negative Precision | Negative Recall | Negative F1 | Positive F1 |
-|------|---------:|-------------------:|----------------:|------------:|------------:|
-| Baseline Logistic Regression | 0.94 | 0.85 | 0.50 | 0.63 | 0.97 |
-| Class-weighted Logistic Regression | 0.90 | 0.49 | 0.88 | 0.63 | 0.94 |
-| Threshold-tuned Logistic Regression (0.5) | 0.90 | 0.49 | 0.88 | 0.63 | 0.94 |
+### 4. Evaluation
+- Precision, Recall, F1-score
+- Confusion Matrix
+- Threshold analysis
 
-## Key Performance
-- Accuracy: ~90%  
-- Negative Recall: ~0.88  
-- Positive F1-score: ~0.94  
+---
 
-The model is optimized to detect negative reviews, which are critical in real-world monitoring systems.
+## 📈 Model Performance
 
-## Key Insights
-- Negative reviews tend to be longer and more detailed
-- Negative reviews receive more helpful votes
-- Verified purchases are more likely to be positive
+| Model | Precision | Recall | F1-score |
+|------|----------|--------|----------|
+| Logistic Regression | ~0.986 | ~0.907 | ~0.944 |
+| Naive Bayes | ~0.916 | ~1.0 | ~0.955 |
 
-These insights highlight behavioral patterns in user-generated content.
+Naive Bayes achieves higher recall but is biased toward the majority class, while Logistic Regression provides more balanced performance.
 
-## Real-World Impact
-Understanding customer sentiment is critical for businesses to:
-- Detect negative feedback early  
-- Improve product quality  
-- Enhance customer satisfaction  
+---
 
-This project demonstrates how machine learning can be applied to large-scale user-generated data to extract actionable insights.
+## ⚖️ Threshold Optimization
 
-## Limitations
-- The model may struggle with sarcasm or complex language
-- Class imbalance still affects precision
-- Only basic NLP techniques (TF-IDF) are used
+Instead of using the default threshold (0.5), the optimal threshold was found using the Precision–Recall curve.
 
-Future improvements could include deep learning models such as BERT.
+- **Best threshold:** ~0.16
+- Improves recall significantly
+- Demonstrates trade-off between precision and recall
 
-## Conclusion
-This project demonstrates how to build a practical sentiment analysis system while addressing real-world challenges such as class imbalance and evaluation trade-offs.
-It emphasizes not only model performance but also interpretability and decision-making.
+📌 Key insight:
+> Model performance is not fixed — it depends heavily on decision threshold.
 
-## Future Work
-- Experiment with advanced models (e.g., BERT)
-- Improve text preprocessing
-- Deploy as an API or web application
-## How to Run
+---
 
-1. Clone the repository
-2. Install dependencies:
-   `pip install -r requirements.txt`
-3. Open the notebooks in order:
-   - `01_data_loading.ipynb`
-   - `02_data_cleaning_and_labeling.ipynb`
-   - `03_eda.ipynb`
-   - `main.ipynb`
+## 🔬 Error Analysis
+
+A detailed error analysis was conducted by manually inspecting misclassified samples.
+
+### Key Findings:
+
+1. **Label Noise**
+   - Some reviews contain negative text but are labeled positive due to rating-based labeling
+   - Indicates weak supervision in the dataset
+
+2. **Mixed Sentiment**
+   - Reviews often contain both positive and negative opinions
+   - Difficult for linear models to classify correctly
+
+3. **Context Dependency**
+   - Words like "but", "however" require understanding sentence structure
+
+4. **Negation Handling**
+   - Phrases like "not bad" are misinterpreted
+
+5. **Weak Sentiment Signals**
+   - Words like "good", "okay" provide weak signals
+
+---
+
+## 📊 Precision–Recall Curve
+
+The Precision–Recall curve highlights the trade-off between precision and recall.
+
+The optimal operating point shows that:
+- Lower thresholds increase recall
+- Higher thresholds increase precision
+
+---
+
+## 🧠 Key Insights
+
+- Model performance is influenced by both **algorithm choice** and **data quality**
+- TF-IDF + Logistic Regression performs well on explicit sentiment
+- However, it struggles with:
+  - context
+  - negation
+  - subtle sentiment
+- Threshold tuning can significantly improve performance without changing the model
+
+---
+
+## 🏗️ Project Structure
+amazon-sentiment-analysis/
+│
+├── data/
+├── notebooks/
+│ └── main.ipynb
+├── results/
+├── README.md
+└── requirements.txt
+
+---
+
+## 🚀 Future Improvements
+
+- Use deep learning models (LSTM, BERT)
+- Incorporate word embeddings
+- Improve labeling quality
+- Perform cross-validation
+- Deploy as a web application
+
+---
+
+## 🧑‍💻 Author
+
+**Tran Dam Khanh**
+
+---
+
+## ⭐ Why This Project Matters
+
+This project goes beyond basic classification by focusing on:
+
+- understanding model behavior
+- identifying real-world data issues
+- making informed decisions using evaluation metrics
+
+It reflects a strong foundation in both **machine learning and analytical thinking**.
