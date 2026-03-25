@@ -47,6 +47,12 @@ Careful threshold tuning and structured error analysis are essential to uncover 
 ### Threshold Optimization
 ![Threshold vs F1](results/figures/threshold_vs_f1.png)
 
+### Class Distribution
+![Class Distribution](results/figures/class_distribution.png)
+
+### Review Length Distribution
+![Review Length Distribution](results/figures/review_length_distribution.png)
+
 ### Threshold Optimization
 
 * Systematically evaluated thresholds from 0.05 → 0.95
