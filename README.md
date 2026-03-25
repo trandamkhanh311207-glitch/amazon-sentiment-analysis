@@ -36,12 +36,16 @@ Careful threshold tuning and structured error analysis are essential to uncover 
 ## Results
 
 ### Confusion Matrix
-
 ![Confusion Matrix](results/figures/confusion_matrix.png)
 
 ### Precision-Recall Curve
-
 ![PR Curve](results/figures/pr_curve.png)
+
+### ROC Curve
+![ROC Curve](results/figures/roc_curve.png)
+
+### Threshold Optimization
+![Threshold vs F1](results/figures/threshold_vs_f1.png)
 
 ### Threshold Optimization
 
