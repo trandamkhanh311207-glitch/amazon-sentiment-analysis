@@ -53,6 +53,18 @@ Careful threshold tuning and structured error analysis are essential to uncover 
 ### Review Length Distribution
 ![Review Length Distribution](results/figures/review_length_distribution.png)
 
+### Top Positive Terms
+![Top Positive Terms](results/figures/top_positive_terms.png)
+
+### Top Negative Terms
+![Top Negative Terms](results/figures/top_negative_terms.png)
+
+#### Model Interpretability
+
+The model assigns high positive weights to words such as "excellent", "perfect", and "great",  
+while strongly negative weights are associated with "terrible", "waste", and "bad".
+
+This provides transparency into what the model has learned and helps validate its behavior.
 ### Threshold Optimization
 
 * Systematically evaluated thresholds from 0.05 → 0.95
