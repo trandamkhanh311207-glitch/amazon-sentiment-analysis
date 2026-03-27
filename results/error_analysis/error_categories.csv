@@ -1,0 +1,6 @@
+error_type,count
+sentiment_intensity_failure,13
+mixed_sentiment,7
+negation_failure,6
+short_text_failure,3
+domain_context_failure,1
