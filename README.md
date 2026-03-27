@@ -1,155 +1,206 @@
-# Amazon Review Sentiment Analysis
+# Amazon Sentiment Analysis
 
 ## Executive Summary
 
-**Problem**
-Build a sentiment classification system for Amazon product reviews and analyze why strong aggregate metrics (e.g., accuracy, F1-score) can still hide critical real-world failure cases.
+* **Problem:** Build a sentiment classification system to identify negative feedback signals from Amazon product reviews.
 
-**Dataset**
-Amazon Electronics reviews (~100,000 sampled subset from a large-scale dataset).
+* **Dataset:** Amazon Electronics reviews (~100K samples), converted into a binary sentiment classification task based on rating.
 
-* Positive: rating ≥ 4
-* Negative: rating ≤ 2
+* **Best Model:** TF-IDF + Logistic Regression with class weighting and threshold optimization.
 
-**Best Model**
-TF-IDF + Logistic Regression with class weighting and threshold optimization
-
-**Best Performance**
-
-* F1-score ≈ **0.97** at optimal threshold (~0.16)
-* Default threshold F1 ≈ **0.945**
-
-**Why This Project Is Non-Trivial**
-This is not a standard text classification task. The project addresses:
-
-* Class imbalance
-* Threshold selection beyond default (0.5)
-* Misleading aggregate metrics
-* Real-world model reliability through error analysis
-
-**Key Insight**
-High performance metrics do not guarantee reliability.
-Careful threshold tuning and structured error analysis are essential to uncover model weaknesses.
+* **Key Insight:** High overall performance can hide critical failure cases, particularly in detecting minority-class (negative) reviews.
 
 ---
 
-## Results
+## 1. Problem Overview
+
+Understanding customer sentiment is essential for product monitoring, quality control, and decision-making.
+
+In real-world systems, detecting **negative feedback** is often more important than maximizing overall accuracy, since negative reviews highlight issues that require action.
+
+This project focuses on building a sentiment classification pipeline while emphasizing:
+
+* class imbalance
+* evaluation beyond accuracy
+* trade-offs between precision and recall
+
+---
+
+## 2. Dataset
+
+* Source: Amazon Electronics Reviews
+* Size: ~100,000 reviews
+* Task: Binary classification
+
+### Labeling Strategy
+
+* Rating ≥ 4 → **Positive**
+* Rating ≤ 2 → **Negative**
+* Rating = 3 → removed (ambiguous)
+
+### Additional Features
+
+* Review length
+* Word count
+* Verified purchase flag
+
+---
+
+## 3. Methodology
+
+### Text Processing
+
+* Lowercasing
+* Basic cleaning
+* TF-IDF vectorization
+
+### Models Evaluated
+
+* Logistic Regression
+* Naive Bayes
+
+### Key Techniques
+
+* **Class weighting** to address imbalance
+* **Threshold tuning** to control decision behavior
+
+### Evaluation Metrics
+
+* Accuracy
+* Precision
+* Recall
+* F1-score
+* Confusion Matrix
+* Precision-Recall Curve
+* ROC Curve
+
+---
+
+## 4. Results
 
 ### Confusion Matrix
+
 ![Confusion Matrix](results/figures/confusion_matrix.png)
 
 ### Precision-Recall Curve
+
 ![PR Curve](results/figures/pr_curve.png)
 
 ### ROC Curve
+
 ![ROC Curve](results/figures/roc_curve.png)
 
+---
+
 ### Threshold Optimization
-![Threshold vs F1](results/figures/threshold_vs_f1.png)
+
+![Threshold vs F1](results/figures/threshold_f1_curve.png)
+
+Adjusting the decision threshold allows better control over precision-recall trade-offs:
+
+* Lower thresholds improve **negative recall**
+* Higher thresholds increase **precision**
+* Optimal threshold depends on application needs, not just maximizing F1
+
+---
+
+## 5. Model Comparison
+
+| Model                                 | Accuracy | Precision | Recall      | F1        | Notes                                    |
+| ------------------------------------- | -------- | --------- | ----------- | --------- | ---------------------------------------- |
+| Logistic Regression (baseline)        | 0.94     | ~0.95     | 0.50        | ~0.65     | High accuracy but poor negative recall   |
+| Logistic Regression (class-weighted)  | 0.90     | ~0.88     | 0.88        | ~0.88     | Strong improvement in minority detection |
+| Logistic Regression (threshold-tuned) | ~0.90    | varies    | up to ~0.90 | optimized | Flexible trade-off depending on use case |
+
+These results show that optimizing for accuracy alone can be misleading in imbalanced classification tasks.
+
+---
+
+## 6. Error Analysis
+
+The model performs well on clear and explicit sentiment expressions but struggles in more complex cases:
+
+### Common Failure Cases
+
+* **Mixed sentiment reviews**
+  Example: “Works great, but the battery life is terrible.”
+
+* **Negation handling**
+  Example: “Not bad at all.”
+
+* **Short or weak-signal reviews**
+  Example: “OK”, “Fine”
+
+* **Ambiguous language**
+  Reviews with unclear or neutral tone
+
+### Key Insight
+
+TF-IDF relies on surface-level lexical features and does not capture:
+
+* compositional meaning
+* contextual dependencies
+* sentiment reversal through negation
+
+---
+
+## 7. Data Insights
 
 ### Class Distribution
+
 ![Class Distribution](results/figures/class_distribution.png)
 
 ### Review Length Distribution
-![Review Length Distribution](results/figures/review_length_distribution.png)
 
-### Error Analysis
-![Error Analysis](results/figures/error_category_bar_chart.png)
-
-### Top Positive Terms
-![Top Positive Terms](results/figures/top_positive_terms.png)
-
-### Top Negative Terms
-![Top Negative Terms](results/figures/top_negative_terms.png)
-
-#### Model Interpretability
-
-The model assigns high positive weights to words such as "excellent", "perfect", and "great",  
-while strongly negative weights are associated with "terrible", "waste", and "bad".
-
-This provides transparency into what the model has learned and helps validate its behavior.
-### Threshold Optimization
-
-* Systematically evaluated thresholds from 0.05 → 0.95
-* Identified optimal threshold maximizing F1-score
-* Demonstrates how default thresholds can be suboptimal
+![Review Length](results/figures/review_length_distribution.png)
 
 ---
 
-## Methodology
+## 8. Key Takeaways
 
-### 1. Data Processing
-
-* Removed neutral reviews (rating = 3)
-* Converted ratings into binary labels
-* Cleaned text data (basic preprocessing)
-* Generated a structured dataset for modeling
-
-### 2. Feature Engineering
-
-* TF-IDF vectorization
-* Sparse high-dimensional representation of text
-
-### 3. Models Evaluated
-
-* Logistic Regression
-* Naive Bayes (Multinomial)
-* (Optional extensions ready)
-
-### 4. Model Optimization
-
-* Class weighting for imbalance handling
-* Threshold tuning based on F1-score
-* Precision-recall trade-off analysis
-
-### 5. Evaluation Strategy
-
-* Accuracy, Precision, Recall, F1-score
-* Confusion Matrix
-* Precision-Recall Curve
-* Threshold vs F1 analysis
+* High accuracy does not guarantee strong real-world performance
+* Minority-class detection (negative reviews) is critical
+* Threshold tuning is a **decision tool**, not just a metric optimization trick
+* Classical models remain competitive when properly tuned
 
 ---
 
-## Error Analysis
+## 9. Limitations
 
-To better understand model limitations, we performed a detailed error analysis on misclassified samples.
+* Labels are derived from ratings → potential label noise
+* TF-IDF cannot capture deep semantic relationships
+* No contextual understanding of language
 
-### Key Findings
-
-- The majority of errors arise from the model's inability to capture **strong sentiment intensity**, particularly in highly negative reviews.
-- The model struggles with **mixed sentiment**, where both positive and negative signals are present in a single review.
-- **Negation structures** (e.g., "doesn't work", "not good") frequently lead to incorrect predictions.
-- Very short reviews (e.g., "OK", "Great product") often lack sufficient context for accurate classification.
-- Domain-specific language has relatively limited impact compared to other linguistic factors.
-
-### Implications
-
-These findings highlight the limitations of TF-IDF representations in capturing:
-- sentiment intensity
-- contextual meaning
-- compositional language structures
-
-Future improvements may involve using contextual embeddings such as BERT.
 ---
 
-## Repository Structure
+## 10. Future Work
+
+Potential improvements include:
+
+* Using contextual embeddings (e.g., BERT) to capture semantic meaning
+* More advanced error analysis techniques
+* Domain-specific fine-tuning
+
+---
+
+## 11. Repository Structure
 
 ```
 amazon-sentiment-analysis/
-├── data/
-│   ├── raw/
-│   ├── interim/
-│   └── processed/
-├── notebooks/
-├── src/
+│
 ├── configs/
+├── data/
+│   └── processed/
+├── demo/
+├── notebooks/
+│   ├── 01_data_loading.ipynb
+│   ├── 02_data_cleaning_and_labeling.ipynb
+│   ├── 03_eda.ipynb
+│   └── 04_modeling_and_evaluation.ipynb
 ├── results/
 │   ├── figures/
-│   ├── tables/
-│   └── error_analysis/
-├── reports/
-├── demo/
+│   └── tables/
+├── src/
 ├── tests/
 ├── README.md
 ├── requirements.txt
@@ -158,16 +209,13 @@ amazon-sentiment-analysis/
 
 ---
 
-## How to Reproduce
+## 12. How to Run
 
 ```bash
-git clone https://github.com/trandamkhanh311207-glitch/amazon-sentiment-analysis.git
-cd amazon-sentiment-analysis
 pip install -r requirements.txt
-jupyter notebook
 ```
 
-Open:
+Open and run:
 
 ```
 notebooks/main.ipynb
@@ -175,41 +223,8 @@ notebooks/main.ipynb
 
 ---
 
-## Dataset
+## 13. Conclusion
 
-The original dataset is too large to be included in this repository.
+This project demonstrates that building an effective sentiment analysis system is not only about achieving high accuracy, but also about understanding model behavior under real-world constraints.
 
-You can download it from:
-https://nijianmo.github.io/amazon/index.html
-
-This project uses a sampled subset (~100k reviews) located in:
-
-```
-data/interim/
-```
-
----
-
-## Key Takeaways
-
-* Default classification thresholds are often suboptimal
-* High F1-score can still mask systematic model failures
-* Error analysis is essential for understanding model behavior
-* Structured pipelines improve reproducibility and clarity
-
----
-
-## Future Improvements
-
-* ROC Curve and calibration analysis
-* Transformer-based models (BERT, RoBERTa)
-* Explainability (SHAP / feature importance)
-* Deployment (Streamlit demo)
-
----
-
-## Author
-
-**Tran Dam Khanh**
-
-This project was developed as part of a data science portfolio focused on building **real-world, interpretable, and production-aware machine learning systems**.
+By focusing on class imbalance, threshold tuning, and error analysis, the project highlights the importance of aligning machine learning models with practical objectives.
