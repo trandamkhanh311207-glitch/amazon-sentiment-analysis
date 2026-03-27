@@ -53,6 +53,9 @@ Careful threshold tuning and structured error analysis are essential to uncover 
 ### Review Length Distribution
 ![Review Length Distribution](results/figures/review_length_distribution.png)
 
+### Error Analysis
+![Error Analysis](results/figures/error_category_bar_chart.png)
+
 ### Top Positive Terms
 ![Top Positive Terms](results/figures/top_positive_terms.png)
 
@@ -110,18 +113,24 @@ This provides transparency into what the model has learned and helps validate it
 
 ## Error Analysis
 
-To move beyond surface-level metrics, the project includes manual error analysis:
+To better understand model limitations, we performed a detailed error analysis on misclassified samples.
 
-* Misclassified samples inspection
-* Identification of common failure patterns:
+### Key Findings
 
-  * Mixed sentiment
-  * Weak sentiment signals
-  * Ambiguous language
-  * Label noise
+- The majority of errors arise from the model's inability to capture **strong sentiment intensity**, particularly in highly negative reviews.
+- The model struggles with **mixed sentiment**, where both positive and negative signals are present in a single review.
+- **Negation structures** (e.g., "doesn't work", "not good") frequently lead to incorrect predictions.
+- Very short reviews (e.g., "OK", "Great product") often lack sufficient context for accurate classification.
+- Domain-specific language has relatively limited impact compared to other linguistic factors.
 
-This step highlights the gap between **metric performance** and **real-world robustness**.
+### Implications
 
+These findings highlight the limitations of TF-IDF representations in capturing:
+- sentiment intensity
+- contextual meaning
+- compositional language structures
+
+Future improvements may involve using contextual embeddings such as BERT.
 ---
 
 ## Repository Structure
