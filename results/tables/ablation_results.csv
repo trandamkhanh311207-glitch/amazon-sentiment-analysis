@@ -1,4 +1,5 @@
-experiment,setting,accuracy,precision,recall,f1
-class_weight ablation,Logistic Regression unweighted (threshold=0.5),0.9449487083087169,0.9508448540706606,0.9904586938485244,0.9702475980377928
-class_weight ablation,Logistic Regression balanced (threshold=0.5),0.9037542295504593,0.9860144367104924,0.9066611354746948,0.9446742821858598
-threshold ablation,Logistic Regression balanced (threshold=0.16),0.9462377141629518,0.959049106368211,0.9826360080597368,0.9706992945584404
+experiment,setting,f1
+class_weight,unweighted (threshold=0.5),0.9702475980377928
+class_weight,balanced (threshold=0.5),0.9446742821858598
+threshold,balanced (threshold=0.5),0.9446742821858598
+threshold,balanced (threshold=0.16),0.9706992945584404
