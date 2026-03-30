@@ -1,41 +1,45 @@
 # Amazon Review Sentiment Analysis
 
-An end-to-end NLP project on Amazon Electronics reviews that explores not only overall sentiment classification performance, but also **reliability under class imbalance, threshold optimization, slice-based evaluation, and manual error analysis**.
+This project explores sentiment classification on Amazon Electronics reviews using a lightweight NLP pipeline built with **TF-IDF** and **classical machine learning models**.
+
+What I wanted to do here was not just train a model and report a high score. I also wanted to understand **why** the model performs well, **where** it struggles, and whether strong overall metrics still hide important failure cases.
+
+That is why this project goes beyond standard model training and includes:
+- threshold tuning
+- model comparison
+- slice-based evaluation
+- manual error analysis
 
 ---
 
 ## Executive Summary
 
-This project builds a lightweight sentiment classifier for Amazon Electronics reviews using **TF-IDF features** and **classical machine learning models**.
+This project builds a binary sentiment classifier for Amazon Electronics reviews.
 
-Rather than stopping at a single accuracy score, this project asks a more important question:
+At first glance, it looks like a fairly standard NLP classification task. But the more interesting question behind the project was this:
 
-> **Can a simple, interpretable NLP pipeline remain highly effective on weakly labeled e-commerce review data, while still revealing where and why it fails?**
+> Can a simple, interpretable model still perform very strongly on noisy e-commerce review data, and if so, where does it remain unreliable?
 
-### Best Result
-- **Best model:** Logistic Regression with class weighting + threshold tuning
+The final best model was **Logistic Regression with class weighting and threshold tuning**, which achieved:
+
 - **Best threshold:** `0.16`
-- **Best F1-score:** **0.9707**
-- **Best accuracy:** **0.9462**
+- **Accuracy:** **0.9462**
+- **F1-score:** **0.9707**
 
-### Main Insight
-A large portion of the final performance gain came **not from using a more complex model**, but from making **better optimization choices inside a lightweight pipeline** — especially:
-- handling class imbalance
-- tuning the decision threshold
-- evaluating failure cases beyond aggregate metrics
+One of the main things I learned from this project is that the final improvement did not mainly come from choosing a more complicated model. A lot of the gain came from making better decisions **inside the same simple pipeline**, especially:
+- tuning the classification threshold
+- thinking carefully about class imbalance
+- evaluating the model on harder subsets of language instead of relying only on one overall score
 
-This project shows that **high overall performance can still hide systematic weaknesses**, particularly on:
-- negation-heavy reviews
-- mixed-sentiment reviews
-- ambiguous or context-dependent language
+So in a way, this project became less about “finding the best model” and more about **understanding what good evaluation actually looks like**.
 
 ---
 
 ## Research Question
 
-**How far can a lightweight and interpretable TF-IDF-based sentiment classifier be pushed on noisy e-commerce review data through class weighting, threshold tuning, and reliability-focused evaluation?**
+**How far can a lightweight and interpretable TF-IDF-based sentiment classifier be pushed on noisy e-commerce review data through threshold tuning, imbalance handling, and reliability-focused evaluation?**
 
-This project is framed not just as a standard text classification task, but as an investigation into how strong aggregate metrics can still mask recurring linguistic failure modes.
+I liked this framing because it shifts the project away from a simple benchmark mindset and toward a more honest question about performance and trustworthiness.
 
 ---
 
@@ -43,27 +47,25 @@ This project is framed not just as a standard text classification task, but as a
 
 This project uses a processed subset of the **Amazon Electronics review dataset**.
 
-### Labeling Strategy
-To create a cleaner binary sentiment task:
+To make the sentiment task cleaner, I converted ratings into binary labels:
+
 - **positive** = rating **4 or 5**
 - **negative** = rating **1 or 2**
 - **neutral reviews (rating = 3)** were excluded
 
-### Why this matters
-This labeling strategy makes the task practical and scalable, but it also introduces an important limitation:
+This makes the task easier to define, but it also introduces an important limitation:
 
-> **Ratings are only a proxy for sentiment, not perfect sentiment annotations.**
+> The labels are derived from ratings, not from direct human sentiment annotation.
 
-That means some apparent model “errors” may actually reflect:
-- label ambiguity
-- mixed opinions inside the same review
-- mismatch between rating and textual sentiment
+That means some “mistakes” made by the model may not be true model failures at all. In some cases, the review text itself is mixed, ambiguous, or does not line up perfectly with the star rating.
+
+That issue became especially obvious during the error analysis section.
 
 ---
 
 ## Project Structure
 
-```text
+```
 amazon-sentiment-analysis/
 │
 ├── configs/
@@ -82,252 +84,313 @@ amazon-sentiment-analysis/
 ├── LICENSE
 ├── README.md
 └── requirements.txt
-
-Methodology
+```
+## Methodology
 1. Text Processing
 
-Reviews were cleaned and transformed into numerical representations using TF-IDF.
+The review text was cleaned and converted into numerical features using TF-IDF.
 
 2. Models Evaluated
 
-The project compares:
+I compared three main setups:
 
 Logistic Regression (unweighted)
 Logistic Regression with class_weight="balanced"
 Multinomial Naive Bayes
 3. Threshold Optimization
 
-Instead of relying only on the default classification threshold of 0.5, the project searches for a threshold that maximizes F1-score.
+Instead of relying only on the default threshold of 0.5, I searched for the threshold that produced the best F1-score.
 
 4. Reliability-Focused Evaluation
 
-In addition to standard metrics, this project includes:
+Rather than stopping at a single classification report, I also included:
 
 model comparison
-ablation study
+ablation analysis
 slice-based evaluation
 manual error analysis
-Main Results
-Model Comparison
-Model	Setting	Accuracy	Precision	Recall	F1
-Logistic Regression	balanced (threshold = 0.16)	0.9462	0.9590	0.9826	0.9707
-Logistic Regression	unweighted (threshold = 0.5)	0.9449	0.9508	0.9905	0.9702
-Multinomial Naive Bayes	default	0.9159	0.9158	0.9991	0.9556
-Logistic Regression	balanced (threshold = 0.5)	0.9038	0.9860	0.9067	0.9447
-Interpretation
 
-The strongest configuration was Logistic Regression with class weighting and threshold tuning, but the comparison also revealed something important:
+That part was important to me, because I did not want this project to turn into another “train model, print metrics, done” notebook.
+## Main Results
 
-Naive Bayes achieved extremely high recall, but lower precision and weaker overall reliability
-Unweighted Logistic Regression performed very strongly
-Balanced Logistic Regression at the default threshold underperformed badly compared to its tuned version
-This means threshold choice mattered enormously
-Threshold Optimization
+### Model Comparison
 
-Threshold tuning was one of the most important parts of the project.
+| Model | Setting | Accuracy | Precision | Recall | F1 |
+|---|---|---:|---:|---:|---:|
+| Logistic Regression | balanced (threshold = 0.16) | 0.9462 | 0.9590 | 0.9826 | **0.9707** |
+| Logistic Regression | unweighted (threshold = 0.5) | 0.9449 | 0.9508 | 0.9905 | 0.9702 |
+| Multinomial Naive Bayes | default | 0.9159 | 0.9158 | 0.9991 | 0.9556 |
+| Logistic Regression | balanced (threshold = 0.5) | 0.9038 | 0.9860 | 0.9067 | 0.9447 |
 
-Key Result
+### What stands out
+A few things became clear from this comparison:
+
+- **Logistic Regression with class weighting and threshold tuning** gave the strongest overall result.
+- **Unweighted Logistic Regression** was already very competitive and performed surprisingly close to the best model.
+- **Multinomial Naive Bayes** achieved extremely high recall, but weaker precision and lower overall balance.
+- **Balanced Logistic Regression at the default threshold** underperformed quite a bit compared to its tuned version.
+
+The most important takeaway here is that the biggest improvement did not come from switching to a completely different model. It came from making better choices inside the same simple pipeline, especially in how the decision threshold was handled.
+
+## Threshold Optimization
+
+This turned out to be one of the most important parts of the project.
+
+### Key Result
 Default threshold (0.5): F1 = 0.9447
 Best threshold (0.16): F1 = 0.9707
 
-This shows that the default classification threshold is not always optimal, especially in imbalanced sentiment tasks where recall and precision need to be balanced more carefully.
+That is a very large jump for a change that does not involve retraining a more advanced model.
 
-Why this matters
+### Why it matters
 
-This is one of the central takeaways of the project:
+This was one of the clearest lessons in the project:
 
-A better optimization choice inside the same simple model can produce a larger improvement than switching to a different model family.
+A smart change inside the same simple model can matter more than switching to a more complicated model.
 
-Ablation Study
+That is exactly why I did not want to treat the default threshold as something fixed or unquestionable.
 
-To isolate where performance gains really came from, I ran a small ablation study.
+## Ablation Study
 
-Experiment	Setting	F1
-Class weight	unweighted (threshold = 0.5)	0.9702
-Class weight	balanced (threshold = 0.5)	0.9447
-Threshold	balanced (threshold = 0.5)	0.9447
-Threshold	balanced (threshold = 0.16)	0.9707
-Ablation Takeaways
-Threshold tuning produced the largest improvement
-Class weighting changed the precision–recall trade-off substantially
-Final gains came less from “bigger models” and more from careful evaluation and optimization choices
-Slice-Based Evaluation
+To understand where the final performance gains actually came from, I ran a small ablation analysis.
 
-Aggregate metrics can hide systematic weaknesses, so I evaluated the best model on several linguistically meaningful subsets.
+Instead of only reporting the best score, I wanted to isolate the effect of two key choices:
+- class weighting
+- threshold tuning
 
-Slice	N	F1
-short_reviews	6527	0.9866
-negation_reviews	7868	0.9457
-mixed_reviews	5499	0.9479
-Interpretation
-Short reviews
+| Experiment | Setting | F1 |
+|---|---|---:|
+| Class weight | unweighted (threshold = 0.5) | 0.9702 |
+| Class weight | balanced (threshold = 0.5) | 0.9447 |
+| Threshold | balanced (threshold = 0.5) | 0.9447 |
+| Threshold | balanced (threshold = 0.16) | **0.9707** |
 
-The model performs exceptionally well on short reviews.
+### What this shows
+A few things stand out from this table:
 
-This likely happens because short reviews often contain very direct sentiment cues such as:
+- **Threshold tuning** produced the biggest improvement.
+- **Class weighting** clearly changed the precision–recall trade-off.
+- The final gain came less from using a more advanced model and more from making better decisions within a lightweight pipeline.
 
-“great”
-“terrible”
-“waste of money”
-“worth it”
-Negation-heavy reviews
+That was one of the most interesting outcomes of the project for me. It showed that careful evaluation and optimization can matter just as much as model choice, and sometimes even more.
 
-Performance drops on negation-heavy reviews.
+## Slice-Based Evaluation
+
+A strong overall score does not always mean a model is equally reliable across all kinds of language.
+
+To test this more carefully, I evaluated the best model on a few linguistically meaningful subsets of the test set:
+- short reviews
+- reviews containing negation
+- reviews containing mixed-sentiment cues
+
+| Slice | N | F1 |
+|---|---:|---:|
+| short_reviews | 6527 | **0.9866** |
+| negation_reviews | 7868 | 0.9457 |
+| mixed_reviews | 5499 | 0.9479 |
+
+### Interpretation
+
+#### Short reviews
+The model performs extremely well on short reviews.
+
+This makes sense because short reviews often contain very direct sentiment signals such as:
+- “great”
+- “terrible”
+- “worth it”
+- “waste of money”
+
+Those are exactly the kinds of patterns a TF-IDF-based model can pick up easily.
+
+#### Negation-heavy reviews
+Performance drops on reviews with negation.
 
 Examples:
+- “not good”
+- “doesn’t work”
+- “not worth the money”
 
-“not good”
-“doesn’t work”
-“not worth the money”
+This is a common weakness of bag-of-words style models, since they can recognize important words but do not really understand how negation changes meaning.
 
-This is a known weakness of bag-of-words style models, because TF-IDF does not truly understand sentence structure.
-
-Mixed-sentiment reviews
-
-Performance also drops on mixed reviews.
+#### Mixed-sentiment reviews
+Performance also drops on reviews that contain both positive and negative signals.
 
 Examples:
+- “good sound but stopped working”
+- “nice design, but overpriced”
+- “works well, although battery life is poor”
 
-“good sound but stopped working”
-“nice design, but overpriced”
-“works well, although battery life is poor”
+These are harder because the model has to deal with contrast and nuance instead of just obvious positive or negative words.
 
-These cases require the model to understand contrast and nuance, which is difficult for linear lexical features.
+### Main takeaway
+Even though the model performs very strongly overall, slice-based evaluation shows that it is not equally reliable everywhere.
 
-Main Slice Insight
+In particular, reviews with negation and mixed sentiment remain noticeably harder than short, direct reviews. That makes this part of the project especially important, because it shows where strong aggregate metrics can still hide real weaknesses.
 
-While the model achieves very strong overall performance, slice-based evaluation shows that:
+## Error Analysis
 
-high aggregate metrics can still conceal consistent weaknesses on linguistically harder cases.
+To go beyond the headline metrics, I manually reviewed misclassified examples and grouped them into recurring error patterns.
 
-Error Analysis
+### Common error categories
+The annotated error cases in this project tended to fall into patterns such as:
+- **mixed sentiment**
+- **negation**
+- **context-dependent meaning**
+- **weak positive / weak negative signals**
+- **ambiguous sentiment**
+- **clear negative language paired with noisy labels**
 
-To go beyond metrics, I manually reviewed misclassified examples and grouped them into recurring failure patterns.
+### Why this matters
+This part of the project changed the way I interpreted the results.
 
-Typical Error Categories
+Before doing error analysis, it was easy to say:
+> the model performs well overall
 
-The manually annotated errors in this project clustered around patterns such as:
+After reviewing the mistakes more closely, the conclusion became more honest:
+> the model performs well overall, but it tends to fail in a few specific and repeated ways
 
-mixed sentiment
-negation
-context-dependent meaning
-weak positive / weak negative signals
-ambiguous sentiment
-clear negative language that conflicted with weak labels
-Why this matters
+That is much more useful than simply knowing the model made errors.
 
-This turns the project from a standard benchmark into a more research-oriented investigation.
+Instead of only reporting that mistakes exist, this section tries to explain:
+- what kinds of mistakes happen
+- why they happen
+- which language patterns are especially difficult
+- which cases may reflect noisy labels rather than pure model failure
 
-Instead of only reporting that the model made mistakes, the project identifies:
+### Main error analysis takeaway
+Many of the errors were not random at all. They came from a relatively small number of repeated issues:
+- noisy supervision from star ratings
+- negation
+- mixed sentiment in the same review
+- vague or weak wording
+- contextual meaning that TF-IDF cannot fully capture
 
-what kinds of mistakes happen
-why they happen
-which linguistic structures are especially difficult
-Main Error Analysis Insight
+That made the project feel less like a basic sentiment classification exercise and more like a small study of reliability under noisy labels.
 
-Many apparent model failures are not random.
-They arise from a small set of repeated linguistic and labeling issues:
+---
 
-weak supervision from ratings
-compositional language
-contrastive sentiment
-ambiguous review wording
-Calibration and Reliability
+## Calibration and Reliability
 
-This project also includes a calibration analysis to examine whether the model’s predicted probabilities are trustworthy, not just whether the final class labels are correct.
+This project also includes a calibration analysis to check whether the model’s predicted probabilities are trustworthy, not just whether the final class labels are correct.
 
-This matters because:
+That matters because:
+- a model can be accurate but still poorly calibrated
+- confidence scores can matter a lot in practical settings
+- reliability is part of model quality, not just raw F1
 
-a model can be accurate but poorly calibrated
-confidence estimates matter in decision-sensitive settings
-reliability is an important part of model quality, not just raw F1
-Visual Outputs
+This section supports one of the main ideas behind the project:
 
-The repository includes result artifacts such as:
+> evaluation should not stop at one metric
 
-class distribution
-review length distribution
-confusion matrix
-precision-recall curve
-ROC curve
-threshold vs F1 plot
-calibration plot
-top positive terms
-top negative terms
-slice evaluation bar chart
-error category distribution chart
+A model can look strong on paper while still being less reliable than expected when its confidence estimates are examined more carefully.
 
-These figures are stored in results/figures/.
+---
 
-Key Findings
-1. Simple models can still be highly competitive
+## Visual Outputs
 
-A lightweight TF-IDF + Logistic Regression pipeline achieved F1 ≈ 0.97, showing that interpretable classical models remain very strong on this task.
+The repository includes a set of figures that help make the results easier to understand and interpret.
 
-2. Optimization choices mattered more than complexity
+These include:
+- class distribution
+- review length distribution
+- confusion matrix
+- precision-recall curve
+- ROC curve
+- threshold vs F1 plot
+- calibration plot
+- top positive terms
+- top negative terms
+- slice evaluation bar chart
+- error category distribution chart
 
-The biggest gain did not come from changing model architecture, but from:
+All visual outputs are stored in `results/figures/`.
 
-threshold tuning
-reliability-focused evaluation
-understanding the precision–recall trade-off
-3. Aggregate metrics are not enough
+I wanted the project to be readable not only through tables and metrics, but also through figures that make the main patterns easier to see at a glance.
 
-Although the best model performed strongly overall, slice-based evaluation and manual error analysis revealed meaningful weaknesses on:
+---
 
-negation
-mixed sentiment
-ambiguous language
-4. Weak labels matter
+## Key Findings
 
-Because labels are derived from ratings rather than direct sentiment annotation, some “errors” reflect label noise or ambiguity, not just pure model weakness.
+### 1. Simple models can still go very far
+A lightweight TF-IDF + Logistic Regression pipeline achieved **F1 ≈ 0.97**, which shows that classical models can still be highly competitive on this task.
 
-Limitations
+### 2. Better evaluation mattered more than more complexity
+The biggest improvement did not come from switching to a more advanced model. It came from:
+- threshold tuning
+- understanding trade-offs more carefully
+- testing the model on harder subsets of language
+
+### 3. A high overall score does not tell the whole story
+Even with strong overall performance, the model still struggled more on:
+- negation
+- mixed sentiment
+- ambiguous or context-heavy reviews
+
+### 4. Weak labels really shape the results
+Because labels come from ratings rather than direct sentiment annotation, some apparent “errors” are actually tied to ambiguity or label noise, not just poor modeling.
+
+Overall, the project showed me that strong results are most convincing when they are paired with careful analysis of where the model is still weak.
+
+---
+
+## Limitations
 
 This project intentionally focuses on classical, interpretable NLP models rather than large transformer-based systems.
 
-Important limitations include:
+Some important limitations are:
+- labels are derived from ratings rather than manually annotated sentiment
+- neutral reviews were excluded, which makes the task cleaner but also somewhat easier
+- TF-IDF cannot fully capture context, negation scope, or compositional meaning
+- results are based on the Electronics subset and may not generalize perfectly to other product domains
+- manual error categories were assigned on a sample, not the entire dataset
 
-labels are inferred from ratings rather than manually annotated sentiment
-neutral reviews were excluded, making the task easier than fully realistic sentiment modeling
-TF-IDF cannot fully capture context, negation scope, or compositional meaning
-results are based on the Electronics subset and may not fully generalize to other product domains
-some error categories were manually assigned on a sample, not on the entire test set
-Future Work
+I think it is important to be clear about these limitations, because a good project should be honest about what its results really mean.
 
-Possible next steps include:
+---
 
-comparing against contextual embedding models
-building a cleaner manually annotated benchmark subset
-adding more robust calibration analysis
-expanding slice evaluation to additional linguistic or product-specific subsets
-exploring deployment via a lightweight interactive demo
-Reproducibility
-Run the notebook
+## Future Work
 
-Main notebook:
+There are several directions I would explore next if I continued this project:
+- compare against contextual embedding models
+- build a cleaner manually annotated benchmark subset
+- expand slice evaluation to other linguistic patterns or domain-specific groups
+- add more detailed calibration analysis
+- turn the pipeline into a lightweight interactive demo
 
+The current version already answers the main question I started with, but there is still plenty of room to push the project further in a more research-oriented direction.
+
+## Reproducibility
+
+If you want to reproduce the results in this project, the main entry point is the notebook below:
+
+### Main notebook
+```
 notebooks/main.ipynb
-Install dependencies
+```
+### Install dependencies
+```
 pip install -r requirements.txt
-Expected outputs
+```
+### Expected outputs
 
 Running the notebook will generate:
-
+```
 results/tables/model_comparison.csv
 results/tables/threshold_results.csv
 results/tables/ablation_results.csv
 results/tables/slice_evaluation.csv
 figures in results/figures/
 misclassified samples and annotation files in results/error_analysis/
-Why this project is meaningful
+```
 
-This project is not just about building a sentiment classifier.
+## Why this project matters to me
+I wanted this project to be more than a standard sentiment classification notebook.
 
-It is about showing that:
+What interested me most was not just whether I could get a high score, but whether I could build a model that looked strong on paper and then still ask a harder question:
 
-strong performance should be interpreted carefully
-model evaluation should go beyond headline metrics
-reliability and error understanding are essential parts of real-world NLP
+If a model performs extremely well overall, can we trust it equally across all kinds of language?
 
-In that sense, the project is closer to a mini research study on weakly labeled sentiment modeling than a basic machine learning exercise.
+The answer here is clearly more nuanced than a single metric suggests.
+
+The model is strong, but not equally strong everywhere.
+That is exactly why this project includes threshold tuning, slice-based evaluation, and manual error analysis. Those parts made the project feel much more meaningful to me than simply reporting one final score.
